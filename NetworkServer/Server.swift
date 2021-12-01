@@ -13,13 +13,19 @@ class Server {
     let port: NWEndpoint.Port
     let listener: NWListener
     let transferDataDelegate : TransferData?
+    
 
-    private var connectionsByID: [Int: ServerConnection] = [:]
+    public var connectionsByID: [Int: ServerConnection] = [:]
 
     init(port: UInt16, transferData : TransferData) {
         self.port = NWEndpoint.Port(rawValue: port)!
         listener = try! NWListener(using: .tcp, on: self.port)
         self.transferDataDelegate = transferData
+    }
+    init(port: UInt16) {
+        self.port = NWEndpoint.Port(rawValue: port)!
+        listener = try! NWListener(using: .tcp, on: self.port)
+        self.transferDataDelegate = nil
     }
 
     func start() throws {
@@ -32,8 +38,10 @@ class Server {
     func stateDidChange(to newState: NWListener.State) {
         switch newState {
         case .ready:
+            transferDataDelegate?.onServerConnected(message: "Server ready.")
           print("Server ready.")
         case .failed(let error):
+            transferDataDelegate?.onServerConnected(message: "Server failure!!!")
             print("Server failure, error: \(error.localizedDescription)")
             exit(EXIT_FAILURE)
         default:
@@ -42,14 +50,24 @@ class Server {
     }
 
     private func didAccept(nwConnection: NWConnection) {
-        let connection = ServerConnection(nwConnection: nwConnection, transferData: self.transferDataDelegate!)
-        self.connectionsByID[connection.id] = connection
+         let connection = ServerConnection(nwConnection: nwConnection, transferData: self.transferDataDelegate!)
+        connectionsByID[connection.id] = connection
+        transferDataDelegate?.onCreateConnectionId(connectionId: connection.id)
         connection.didStopCallback = { data in
             self.connectionDidStop(connection)
         }
         connection.start()
-        connection.send(data: "Welcome you are connection: \(connection.id)".data(using: .utf8)!)
         print("server did open connection \(connection.id)")
+    }
+    public func connectionSendData(data: Data, connectionId: Int){
+        
+        guard let connection = connectionsByID[connectionId] else {
+            return
+        }
+//        if self.connection != nil {
+        connection.send(data: data)
+//            self.connection.sened(data: data)
+//        }
     }
 
     private func connectionDidStop(_ connection: ServerConnection) {

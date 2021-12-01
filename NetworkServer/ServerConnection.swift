@@ -11,18 +11,12 @@ import SwiftUI
 protocol ReceiveDelegate{
     func onReceive(data: Data)
 }
-class DataMessage : ObservableObject{
-    @Published var message: Data?
-
-}
-
 
 @available(macOS 10.14, *)
 class ServerConnection{
-    @ObservedObject var dataMessage = DataMessage()
     var transferDataDelegate: TransferData?
-    //The TCP maximum package size is 64K 65536
-    let MTU = 251993
+//The TCP maximum package size is 64K 65536
+    let MTU = 251993    
 //    let MTU = 100000000
 
     private static var nextID: Int = 0

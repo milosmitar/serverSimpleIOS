@@ -17,6 +17,10 @@
 		381F8FF9274BE5A500DAA84E /* NetworkServerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 381F8FF8274BE5A500DAA84E /* NetworkServerUITestsLaunchTests.swift */; };
 		381F9006274BE81600DAA84E /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = 381F9005274BE81600DAA84E /* Server.swift */; };
 		381F9008274BE85600DAA84E /* ServerConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 381F9007274BE85600DAA84E /* ServerConnection.swift */; };
+		387DA39E2756407E00466524 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 387DA39D2756407E00466524 /* ImagePicker.swift */; };
+		387DA3A0275644A300466524 /* InternetHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 387DA39F275644A300466524 /* InternetHelper.swift */; };
+		387DA3A22756493900466524 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 387DA3A12756493900466524 /* Message.swift */; };
+		387DA3A4275651E600466524 /* ChatRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 387DA3A3275651E600466524 /* ChatRow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +54,10 @@
 		381F8FF8274BE5A500DAA84E /* NetworkServerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServerUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		381F9005274BE81600DAA84E /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
 		381F9007274BE85600DAA84E /* ServerConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerConnection.swift; sourceTree = "<group>"; };
+		387DA39D2756407E00466524 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		387DA39F275644A300466524 /* InternetHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternetHelper.swift; sourceTree = "<group>"; };
+		387DA3A12756493900466524 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		387DA3A3275651E600466524 /* ChatRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +115,10 @@
 				381F9005274BE81600DAA84E /* Server.swift */,
 				381F9007274BE85600DAA84E /* ServerConnection.swift */,
 				38025FA6274D4567001EA8B2 /* Extension.swift */,
+				387DA39D2756407E00466524 /* ImagePicker.swift */,
+				387DA39F275644A300466524 /* InternetHelper.swift */,
+				387DA3A12756493900466524 /* Message.swift */,
+				387DA3A3275651E600466524 /* ChatRow.swift */,
 			);
 			path = NetworkServer;
 			sourceTree = "<group>";
@@ -269,7 +281,11 @@
 				38025FA7274D4567001EA8B2 /* Extension.swift in Sources */,
 				381F9008274BE85600DAA84E /* ServerConnection.swift in Sources */,
 				381F8FDE274BE5A400DAA84E /* ContentView.swift in Sources */,
+				387DA39E2756407E00466524 /* ImagePicker.swift in Sources */,
+				387DA3A4275651E600466524 /* ChatRow.swift in Sources */,
 				381F9006274BE81600DAA84E /* Server.swift in Sources */,
+				387DA3A22756493900466524 /* Message.swift in Sources */,
+				387DA3A0275644A300466524 /* InternetHelper.swift in Sources */,
 				381F8FDC274BE5A400DAA84E /* NetworkServerApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

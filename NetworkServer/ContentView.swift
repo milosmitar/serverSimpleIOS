@@ -9,150 +9,173 @@ import SwiftUI
 
 protocol TransferData{
     func onMessageReceive(data: Data)
+    func onServerConnected(message: String)
+    func onCreateConnectionId(connectionId: Int)
 }
 
 struct ContentView: View, TransferData {
-    func onMessageReceive(data: Data) {
-        let uiimate = UIImage(data: data)
-        if(uiimate != nil){
-        self.image = Image(uiImage: uiimate!)
-        }
+    func onCreateConnectionId(connectionId: Int) {
+        self.connectionId = connectionId
     }
     
-    @EnvironmentObject private var message: DataMessage
     @State private var text = Text("Hello world")
     @State var placeholder : String = " napisi text"
     @State private var passData = false
     @State private var image = Image(systemName: "photo")
     @State private var showImagePicker = false
     @State var write = ""
-    @State var connectionStatus = "connect"
-  
+    @State var connectionStatus = Text("status")
+    @State private var inputImage: UIImage?
+    @State var messages : [Message] = []
+    @State var server: Server?
+    @State var connectionId : Int?
+    
     
     let pub = NotificationCenter.default
-                .publisher(for: NSNotification.Name("passData"))
+        .publisher(for: NSNotification.Name("passData"))
     var body: some View {
         NavigationView{
-            VStack( spacing: 50){
-                image.resizable().scaledToFit()
-            text.padding()
-            .onTapGesture {
-                serverStart()
-            }
-                TextEditor(text: $placeholder).padding().cornerRadius(10).frame(height: 100).colorMultiply(Color.blue)
-
-                Image(systemName: "paperplane.fill").onTapGesture {
-
+            VStack{
+                ScrollView(.vertical, showsIndicators: false){
+                    VStack(alignment: .center){
+                        ForEach(messages, id: \.self){ message in
+                            ChatRow(message: message)
+                        }
+                    }
                 }
-                    .font(.largeTitle)
+                HStack{
+                    cameraButton
+                    TextField("message...", text: $write)
+                        .padding(10)
+                        .background(Color(red: 233.0/255, green: 234.0/255, blue: 243.0/255))
+                        .cornerRadius(25)
+                    Image(systemName: "paperplane.fill").font(.system(size: 20))
+                        .foregroundColor((self.write.count > 0) ? Color.blue : Color.gray).rotationEffect(.degrees(45)).onTapGesture {
+                            sendMessage(data: self.write.data(using: .ascii) ?? Data())
+                        }
+                }.padding()
+                
             }
-//            VStack{
-//
-//                HStack{
-//                    cameraButton
-//                    TextField("message...", text: $write)
-//                        .padding(10)
-//                        .background(Color(red: 233.0/255, green: 234.0/255, blue: 243.0/255))
-//                        .cornerRadius(25)
-//                    Image(systemName: "paperplane.fill").font(.system(size: 20))
-//                        .foregroundColor((self.write.count > 0) ? Color.blue : Color.gray).rotationEffect(.degrees(50))
-//                }.padding()
-//            }
-            .navigationBarItems(leading: titleBar)
-//            .onAppear(perform: {
-//                
-//                NotificationCenter.default.addObserver(forName:  NSNotification.Name(rawValue: "passData"), object: nil, queue: nil,  using:{ notification in
-//			                    if let userInfo = notification.userInfo, let info = userInfo["info"] {
-//                                   
-////                                    var buffer = [UInt8](repeating: 0, count: data.count)
-////                                    inputStream.read(&buffer, maxLength: data.count)
-////                                    
-////                                    while(inputStream.hasBytesAvailable)
-////                                    let data = info as! Data
-////                                    if(data.count > 0){
-////                                        var buffer = [UInt8](repeating: 0, count: data.count)
-////                                        inputStream.read(&buffer, maxLength: data.count)
-////                                        print(inputStream)
-////                                    }else{
-////                                        print("zavrseno")
-////                                    }
-//                                    
-//                                    print("pozvan")
-//                                    let uiimate = UIImage(data: info as! Data)
-//                                    if(uiimate != nil){
-//                                    self.image = Image(uiImage: uiimate!)
-//                                    }
-//                      print(info)
-//                   }
-//                })
-//            })
-           
+            .sheet(isPresented: $showImagePicker, onDismiss: loadImage){
+                ImagePicker(image: self.$inputImage)
+            }
+            .navigationBarItems(leading: titleBar,trailing: connectionStatus)
+            
         }
+    }
+    func loadImage(){
+//        sendMessage(data: )
+//        guard let inputImage = inputImage else {
+//            return
+//        }
+//        image = Image(uiImage: inputImage)
+    }
+    private func sendMessage(data: Data){
+        
+        if server != nil && connectionId != nil{
+            server?.connectionSendData(data: data, connectionId: connectionId ?? 0)
+        }
+        
     }
     private var titleBar: some View{
         HStack{
-            Text(self.connectionStatus).foregroundColor((self.connectionStatus.elementsEqual("connect")) ? Color.green : Color.red)
+            Button( "start server ".appending(InternetHelper.getIpAddress() ?? "unknown ip adress") ) {
+                serverStart()
+            }
+            //            Text(self.connectionStatus).foregroundColor((self.connectionStatus.elementsEqual("connect")) ? Color.green : Color.red)
         }
     }
     private var cameraButton: Button<Image>{
-        return Button(action:{ self.showImagePicker = true}){
+        return Button(action:{
+            self.showImagePicker = true
+            
+        }){
             Image(systemName: "camera")
         }
     }
     
-      func showSpinningWheel(_ notification: NSNotification) {
-           print(notification.userInfo ?? "")
-           if let dict = notification.userInfo as NSDictionary? {
-               if let message = dict["message"] as? String{
-                   print(message)
-                   // do something with your image
-               }
-           }
+    func showSpinningWheel(_ notification: NSNotification) {
+        print(notification.userInfo ?? "")
+        if let dict = notification.userInfo as NSDictionary? {
+            if let message = dict["message"] as? String{
+                print(message)
+                // do something with your image
+            }
+        }
     }
-    func passDataFunc(){
-//       guard let message = message else {
-//           return
-//       }
-//       text = Text(message)
-   }
+    
     private func serverStart(){
         if #available(macOS 10.14, *) {
             
-//        initServer(port: 9999)
-            let server = Server(port: 9999, transferData: self)
-            try! server.start()
+            server = Server(port: 9999, transferData: self)
+            try! server!.start()
             
-        RunLoop.current.run()
-
+//            RunLoop.current.run()
+            
         } else {
-          let stderr = FileHandle.standardError
-          let message = "Requires macOS 10.14 or newer"
-          stderr.write(message.data(using: .utf8)!)
-          exit(EXIT_FAILURE)
+            let stderr = FileHandle.standardError
+            let message = "Requires macOS 10.14 or newer"
+            stderr.write(message.data(using: .utf8)!)
+            exit(EXIT_FAILURE)
         }
         
     }
-   
-//    func initServer(port: UInt16) {
-//        let server = Server(port: port)
-//        try! server.start()
-//    }
-}
-struct PassDataToContent{
-    
-    @Binding var text: Text?
-    
-   
-}
-extension PassDataToContent: ReceiveDelegate{
-    func onReceive(data: Data) {
-        text = Text(String(data: data, encoding: .utf8) ?? "")
+    func onServerConnected(message: String) {
+        self.connectionStatus = Text(message)
+        
     }
+    func onMessageReceive(data: Data) {
+        let message = Message(data: data)
+        self.messages.append(message)
+//        let uiimate = UIImage(data: data)
+//        if(uiimate != nil){
+//            self.image = Image(uiImage: uiimate!)
+//        }
+    }
+    
 }
-
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
+}
+
+class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate{
+    let parent: ImagePicker
+    
+    init(_ parent: ImagePicker) {
+        self.parent = parent
+    }
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let uiImage = info[.originalImage] as? UIImage {
+            parent.image = uiImage
+            guard let data = uiImage.jpegData(compressionQuality:1.0)
+                    
+            else {
+                return
+            }
+            sendImage(dataImage: data)
+            //            initClient(server: "192.168.0.27", port: 9999)
+        }
+        parent.presentationMode.wrappedValue.dismiss()
+    }
+    func sendImage(dataImage: Data){
+        
+        
+    }
+    
+    //    func initClient(server: String, port: UInt16) {
+    //        let client = Client(host: server, port: port)
+    //        client.start()
+    ////        let uiimage = parent.image!.asUIImage()
+    ////        let cgImage:CGImage = context.createCGImage(parent.image!, from:
+    ////        cameraImage.extent)!     //cameraImage is grabbed from video frame
+    ////        image = UIImage.init(cgImage: cgImage)
+    ////        let data = UIImageJPEGRepresentation(image, 1.0)
+    //
+    //        client.connection.send(data: parent.image!.jpegData(compressionQuality: 0.000005)!)
+    //        }
+    
+    
 }
