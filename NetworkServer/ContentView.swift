@@ -64,11 +64,15 @@ struct ContentView: View, TransferData {
         }
     }
     func loadImage(){
+//        self.image.
 //        sendMessage(data: )
-//        guard let inputImage = inputImage else {
-//            return
-//        }
-//        image = Image(uiImage: inputImage)
+        guard let inputImage = inputImage else {
+            return
+        }
+        guard let data = inputImage.jpegData(compressionQuality: 1.0) else{
+            return
+        }
+       sendMessage(data: data)
     }
     private func sendMessage(data: Data){
         
