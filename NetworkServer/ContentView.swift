@@ -31,6 +31,7 @@ struct ContentView: View, TransferData {
     @State var connectionId : Int?
     
     
+    
     let pub = NotificationCenter.default
         .publisher(for: NSNotification.Name("passData"))
     var body: some View {
@@ -53,9 +54,9 @@ struct ContentView: View, TransferData {
                         .foregroundColor((self.write.count > 0) ? Color.blue : Color.gray).rotationEffect(.degrees(45)).onTapGesture {
                             sendMessage(data: self.write.data(using: .ascii) ?? Data())
                         }
-                }.padding()
+                }
                 
-            }
+            }.padding()
             .sheet(isPresented: $showImagePicker, onDismiss: loadImage){
                 ImagePicker(image: self.$inputImage)
             }
@@ -76,9 +77,13 @@ struct ContentView: View, TransferData {
     }
     private func sendMessage(data: Data){
         
+        
         if server != nil && connectionId != nil{
             server?.connectionSendData(data: data, connectionId: connectionId ?? 0)
         }
+        let message = Message(data: data, recived: false)
+        messages.append(message)
+        self.write = ""
         
     }
     private var titleBar: some View{
@@ -129,7 +134,7 @@ struct ContentView: View, TransferData {
         
     }
     func onMessageReceive(data: Data) {
-        let message = Message(data: data)
+        let message = Message(data: data, recived: true)
         self.messages.append(message)
 //        let uiimate = UIImage(data: data)
 //        if(uiimate != nil){

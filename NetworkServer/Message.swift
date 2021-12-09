@@ -10,4 +10,5 @@ import Foundation
 struct Message: Hashable{
     var id = UUID()
     var data : Data
+    var recived: Bool
 }
