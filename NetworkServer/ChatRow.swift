@@ -19,7 +19,7 @@ struct ChatRow: View{
                 if !message.recived {
                     HStack {
                         Spacer()
-                        image(data: message.data)?.resizable().scaledToFit().frame(width: 250, height: 200, alignment: .trailing).cornerRadius(5)
+                        image(data: message.data)?.resizable().scaledToFill().frame(width: 250, height: 200, alignment: .trailing).cornerRadius(5)
                     }.padding(.leading,75)
                     
                     //                    image(data: message.data)?.resizable().scaledToFit().frame(width: 250, height: 200, alignment: .leading)
@@ -39,13 +39,13 @@ struct ChatRow: View{
                         Spacer()
                         textMessage(data: message.data)
                             .modifier(chatModifier(myMessage: true))
-                    }.padding(.leading,75)
+                    }.padding(.leading,75).cornerRadius(5)
                 }else{
                     HStack {
                         textMessage(data: message.data)
                             .modifier(chatModifier(myMessage: false))
                         Spacer()
-                    }.padding(.trailing,75)
+                    }.padding(.trailing,75).cornerRadius(5)
                     //                    Spacer()
                     //                    textMessage(data: message.data)
                 }

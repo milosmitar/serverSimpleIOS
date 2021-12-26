@@ -87,7 +87,7 @@ class ServerConnection{
                     self.displayData.append(data)
                     self.receivedDataCount = self.receivedDataCount! - UInt32(data.count)
                 }else{
-                    
+                    self.displayData.append(data)
                     self.transferDataDelegate?.onMessageReceive(data: self.displayData)
                     self.displayData = Data()
                     self.receivedDataCount = nil
@@ -103,39 +103,28 @@ class ServerConnection{
             }
         }
     }
-    //    func extract(from data: inout Data) -> Data? {
-    //        guard data.count > 0 else {
-    //            return nil
-    //        }
-    //
-    //        // Define the length of data to return
-    //        let length = Int.init(data[0])
-    //
-    //        // Create a range based on the length of data to return
-    //        let range = Range(0..<length)
-    //
-    //        // Get a new copy of data
-    //        let subData = data.subdata(in: range)
-    //
-    //        // Mutate data
-    //        data.removeSubrange(range)
-    //
-    //        // Return the new copy of data
-    //        return subData
-    //    }
-    
-    //     @objc func passMessageNotification(_ notification: Notification){
-    //         print(notification)
-    //     }
     
     func send(data: Data) {
-        self.connection.send(content: data, completion: .contentProcessed( { error in
+        let dataLength = data.count
+        
+        let value: UInt32 = UInt32(dataLength)
+        var finalData = withUnsafeBytes(of: value.bigEndian, Array.init)
+        finalData.append(contentsOf: data)
+        
+        self.connection.send(content: finalData, completion: .contentProcessed( { error in
             if let error = error {
                 self.connectionDidFail(error: error)
                 return
             }
-            print("connection \(self.id) did send, data: \(data as NSData)")
+                print("connection did send, data: \(data as NSData)")
         }))
+//        self.connection.send(content: data, completion: .contentProcessed( { error in
+//            if let error = error {
+//                self.connectionDidFail(error: error)
+//                return
+//            }
+//            print("connection \(self.id) did send, data: \(data as NSData)")
+//        }))
     }
     
     func stop() {

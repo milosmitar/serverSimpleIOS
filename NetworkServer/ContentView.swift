@@ -76,8 +76,6 @@ struct ContentView: View, TransferData {
        sendMessage(data: data)
     }
     private func sendMessage(data: Data){
-        
-        
         if server != nil && connectionId != nil{
             server?.connectionSendData(data: data, connectionId: connectionId ?? 0)
         }
