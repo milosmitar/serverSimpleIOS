@@ -37,13 +37,7 @@ struct ContentView: View, TransferData {
     var body: some View {
         NavigationView{
             VStack{
-                ScrollView(.vertical, showsIndicators: false){
-                    VStack(alignment: .center){
-                        ForEach(messages, id: \.self){ message in
-                            ChatRow(message: message)
-                        }
-                    }
-                }
+                ChatScrollView(messages: $messages)
                 HStack{
                     cameraButton
                     TextField("message...", text: $write)
@@ -57,23 +51,23 @@ struct ContentView: View, TransferData {
                 }
                 
             }.padding()
-            .sheet(isPresented: $showImagePicker, onDismiss: loadImage){
-                ImagePicker(image: self.$inputImage)
-            }
-            .navigationBarItems(leading: titleBar,trailing: connectionStatus)
+                .sheet(isPresented: $showImagePicker, onDismiss: loadImage){
+                    ImagePicker(image: self.$inputImage)
+                }
+                .navigationBarItems(leading: titleBar,trailing: connectionStatus)
             
         }
     }
     func loadImage(){
-//        self.image.
-//        sendMessage(data: )
+        //        self.image.
+        //        sendMessage(data: )
         guard let inputImage = inputImage else {
             return
         }
         guard let data = inputImage.jpegData(compressionQuality: 1.0) else{
             return
         }
-       sendMessage(data: data)
+        sendMessage(data: data)
     }
     private func sendMessage(data: Data){
         if server != nil && connectionId != nil{
@@ -117,7 +111,7 @@ struct ContentView: View, TransferData {
             server = Server(port: 9999, transferData: self)
             try! server!.start()
             
-//            RunLoop.current.run()
+            //            RunLoop.current.run()
             
         } else {
             let stderr = FileHandle.standardError
@@ -134,10 +128,10 @@ struct ContentView: View, TransferData {
     func onMessageReceive(data: Data) {
         let message = Message(data: data, recived: true)
         self.messages.append(message)
-//        let uiimate = UIImage(data: data)
-//        if(uiimate != nil){
-//            self.image = Image(uiImage: uiimate!)
-//        }
+        //        let uiimate = UIImage(data: data)
+        //        if(uiimate != nil){
+        //            self.image = Image(uiImage: uiimate!)
+        //        }
     }
     
 }
