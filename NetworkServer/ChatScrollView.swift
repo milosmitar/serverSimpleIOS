@@ -24,7 +24,7 @@ struct ChatScrollView: View {
                     proxy.scrollTo(index - 1)
                 }
             })
-        }
+        }.padding(.bottom, 8)
     }
 }
 
